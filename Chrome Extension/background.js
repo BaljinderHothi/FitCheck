@@ -33,7 +33,7 @@ chrome.runtime.onInstalled.addListener(() => {
       
       if new user do survey
       
-      if not new user we would just */
+      if not new user we would just jump into working fully */
       
       promptUserLogin();
     }
@@ -62,7 +62,7 @@ chrome.runtime.onInstalled.addListener(() => {
     that it can start working 
     it would communicate the auth token for that user*/
     
-    chrome.tabs.create({ url: 'https://yourapp.com/login' });
+    chrome.tabs.create({ url: 'insert the url here' });
   }
   
   
@@ -78,4 +78,126 @@ chrome.runtime.onInstalled.addListener(() => {
     }
     
     return true;
+  });
+
+  function scheduleReviewReminder(purchaseData) {
+    /* set up a reminder in the database for specific purchases,
+    we then use that reminder to prompt the user to make a review of a purchase lets say after like 10 days from buying it */
+    
+    const purchaseDate = new Date(purchaseData.timestamp);
+    const reviewDate = new Date(purchaseDate);
+    reviewDate.setDate(reviewDate.getDate() + 7); // One week later
+    
+    //review reminders stored locally
+    chrome.storage.local.get(['pendingReviews'], function(result) {
+      const pendingReviews = result.pendingReviews || [];
+      pendingReviews.push({
+        purchaseId: purchaseData.id,
+        product: purchaseData.item,
+        reviewDue: reviewDate.toISOString(),
+        url: purchaseData.url
+      });
+      
+      chrome.storage.local.set({ pendingReviews });
+    });
+  }
+  
+  function saveProductReview(reviewData) {
+    chrome.storage.local.get(['userToken'], function(result) {
+      if (!result.userToken) {
+        promptUserLogin();
+        return;
+      }
+      
+      /* create an endpoint to save the review data and send it to the ML model for better fine tuning reviews*/
+      
+      fetch('https://yourapi.com/api/reviews/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${result.userToken}`
+        },
+        body: JSON.stringify(reviewData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        //update the prending review list
+        removeFromPendingReviews(reviewData.purchaseId);
+        
+        //updates the user with the confirmation
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: 'icons/icon48.png',
+          title: 'Review Submitted',
+          message: 'Thank you for your feedback! It helps improve recommendations for future purchases!.'
+        });
+      })
+      .catch(error => {
+        console.error('Error saving review:', error);
+      });
+    });
+  }
+  
+  //checking for pending due reviews
+  function checkPendingReviews() {
+    chrome.storage.local.get(['pendingReviews'], function(result) {
+      const pendingReviews = result.pendingReviews || [];
+      const now = new Date();
+      
+      pendingReviews.forEach(review => {
+        const reviewDue = new Date(review.reviewDue);
+        if (reviewDue <= now) {
+          promptForReview(review);
+        }
+      });
+    });
+  }
+  
+  function promptForReview(reviewItem) {
+   /* create the popup for users to leave a review, can honestly look like 
+   
+   item          price
+   link          1-5 stars
+   
+   Typed message review (if we go that route)*/
+    
+    chrome.windows.create({
+      url: `review.html?purchaseId=${reviewItem.purchaseId}&product=${encodeURIComponent(reviewItem.product)}`,
+      type: 'popup',
+      width: 400,
+      height: 500
+    });
+  }
+  
+  //removes review from pending reviews, once a submission has been made
+  function removeFromPendingReviews(purchaseId) {
+    chrome.storage.local.get(['pendingReviews'], function(result) {
+      const pendingReviews = result.pendingReviews || [];
+      const updatedReviews = pendingReviews.filter(review => review.purchaseId !== purchaseId);
+      chrome.storage.local.set({ pendingReviews: updatedReviews });
+    });
+  }
+  
+  chrome.alarms.create('checkReviews', { periodInMinutes: 1440 }); // Once per day
+  
+  
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'checkReviews') {
+      checkPendingReviews();
+    }
+  });
+  
+  
+  chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+    if (buttonIndex === 0) { // "See Details" button
+      chrome.storage.local.get(['latestRecommendation'], function(result) {
+        if (result.latestRecommendation) {
+          //open the recommendation details page
+          chrome.tabs.create({ 
+            url: `recommendation.html?data=${encodeURIComponent(JSON.stringify(result.latestRecommendation))}` 
+          });
+        }
+      });
+    }
+    
   });
