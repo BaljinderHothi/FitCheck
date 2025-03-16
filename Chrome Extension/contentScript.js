@@ -71,3 +71,75 @@ function checkLoginStatus() {
     }
   });
 }
+
+function showRecommendation(recommendation) {
+    
+    const popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.bottom = '20px';
+    popup.style.right = '20px';
+    popup.style.width = '300px';
+    popup.style.padding = '15px';
+    popup.style.backgroundColor = 'white';
+    popup.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+    popup.style.borderRadius = '5px';
+    popup.style.zIndex = '9999';
+    
+    const score = recommendation.score;
+    let color, title;
+    
+    if (score >= 0.8) {
+      color = '#4CAF50'; // Green
+      title = 'Great Purchase!';
+    } else if (score >= 0.5) {
+      color = '#FFC107'; // Yellow
+      title = 'Decent Purchase';
+    } else {
+      color = '#F44336'; // Red
+      title = 'Consider Alternative';
+    }
+    
+    popup.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0; color: ${color};">${title}</h3>
+        <button id="close-rec" style="background: none; border: none; cursor: pointer;">✕</button>
+      </div>
+      <p>${recommendation.message}</p>
+      <div style="text-align: right;">
+        <button id="view-details" style="background-color: #4285f4; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">View Details</button>
+      </div>
+    `;
+    
+
+    document.body.appendChild(popup);
+    
+
+    document.getElementById('close-rec').addEventListener('click', () => {
+      popup.remove();
+    });
+    
+
+    document.getElementById('view-details').addEventListener('click', () => {
+      chrome.runtime.sendMessage({
+        type: 'OPEN_RECOMMENDATION_DETAILS',
+        data: recommendation
+      });
+      popup.remove();
+    });
+    
+
+    setTimeout(() => {
+      if (document.body.contains(popup)) {
+        popup.remove();
+      }
+    }, 10000);
+  }
+  
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'SHOW_RECOMMENDATION') {
+      showRecommendation(message.data);
+    }
+    
+    return true;
+  });
