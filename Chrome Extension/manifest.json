@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Fit Check Purchase Tracker",
+    "name": "Fit Check",
     "version": "1.0",
-    "description": "Scrapes purchase items and prices from pages to help track spending.",
+    "description": "This extension scrapes purchase items and prices from pages to help track spending.",
     "permissions": [
       "storage",
       "scripting",
