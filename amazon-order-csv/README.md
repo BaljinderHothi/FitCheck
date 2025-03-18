@@ -27,3 +27,11 @@ A simple Chrome extension that allows you to export your Amazon order history to
 ## Note
 
 Make sure you're logged into your Amazon account and on the orders page before using the extension. 
+
+## Tests
+The tests for this Chrome Extension is mainly created in the tests folder inside of amazon-order-csv. 
+In order to run the tests,
+```
+npx jest
+```
+We mainly focused on unit and integration tests because it is difficult to do and End-to-End test when the parts of the project we worked on is scattered. In the future versions, we expect to be able to run End-to-End tests taking into factor the database, model, and the Chrome Extension itself.
