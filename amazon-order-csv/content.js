@@ -1,4 +1,3 @@
-let scriptInjected = false;
 
 async function extractOrders() {
   return new Promise((resolve) => {
@@ -102,19 +101,25 @@ function downloadCSV(data) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+  
 }
 
 
-// Listen for messages from the popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'exportOrders') {
-    if (scriptInjected) return; // Prevent double execution
-    scriptInjected = true;
+    extractOrders().then((orders) => {
+      if (orders.length > 0) {
+        const csvData = convertToCSV(orders);
+        downloadCSV(csvData); // Call download here
+      } else {
+        console.log('No orders found to export.');
+      }
+    });
 
-    extractOrders(); // Your function to extract orders
     sendResponse({ success: true });
   }
 });
+
 
 // Export functions for testing
 if (typeof module !== 'undefined' && module.exports) {
