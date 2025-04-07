@@ -1,3 +1,13 @@
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'SUBMIT_REVIEW') {
+      console.log('Received review:', message.data);
+      // Add your API call here
+      sendResponse({ success: true });
+      alert('Review submitted successfully!');
+      return true;
+    }
+  });
+
 
 // chrome.runtime.onInstalled.addListener(() => {
 //     console.log('Extension installed');

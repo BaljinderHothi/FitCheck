@@ -1,9 +1,32 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const purchaseId = urlParams.get('purchaseId');
+  const productName = urlParams.get('product');
+
+  let selectedRating = 0;
+  const stars = document.querySelectorAll('.star');
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      const value = parseInt(star.getAttribute('data-value'));
+      selectedRating = value;
+      
+      stars.forEach(s => {
+        const starValue = parseInt(s.getAttribute('data-value'));
+        if (starValue <= selectedRating) {
+          s.classList.add('selected');
+        } else {
+          s.classList.remove('selected');
+        }
+      });
+    });
+  });
+
   const exportBtn = document.getElementById('exportBtn');
-  
+  const submitReviewBtn = document.getElementById("submitReview");
+
   exportBtn.addEventListener('click', async () => {
-    if (exportBtn.dataset.clicked) return; // Prevent multiple clicks
-    exportBtn.dataset.clicked = true; // Mark as clicked
+    if (exportBtn.dataset.clicked) return;
+    exportBtn.dataset.clicked = true;
 
     console.log("Exporting orders...");
 
@@ -36,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (error) {
       console.error('Error:', error);
     }
-  }, { once: true }); // Ensures event runs only once
+  }, { once: true });
 
   chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     if (!tabs[0].url.includes('amazon.com')) {
@@ -67,5 +90,88 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
-  
+
+  // Only ONE event listener for the submit button
+  submitReviewBtn.addEventListener("click", async () => {
+    console.log("Submit button clicked"); // This will print to Chrome console
+    
+    const productSelector = document.getElementById('productSelector');
+    const reviewText = document.getElementById('reviewText').value;
+    const worthIt = document.getElementById('worthIt').value;
+    
+    // Rest of your existing code...
+    if (!productSelector.value || productSelector.selectedIndex <= 0) {
+      alert('Please select a product to review');
+      return;
+    }
+    
+    if (selectedRating === 0) {
+      alert('Please select a rating');
+      return;
+    }
+    
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      if (!tab.url.includes('amazon.com')) {
+        console.error('Please navigate to Amazon orders page');
+        return;
+      }
+
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['review.js']
+      });
+
+      chrome.tabs.sendMessage(tab.id, { action: 'SUBMIT_REVIEW' }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Chrome runtime error:', chrome.runtime.lastError);
+          return;
+        }
+        
+        if (response && response.success) {
+          console.log('Submit (line 133) successfully!');
+        } else {
+          console.error(response?.error || 'Failed to export orders.');
+        }
+      });
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+  })
 });
+    
+    // const reviewData = {
+    //   product: productSelector.options[productSelector.selectedIndex].text,
+    //   rating: selectedRating,
+    //   review: reviewText,
+    //   worthIt,
+    //   timestamp: new Date().toISOString()
+    // };
+  
+    //console.log('Submitting review:', reviewData);
+    //alert('Submitting review...');
+    // try {
+    //   const response = await new Promise((resolve) => {
+    //     chrome.runtime.sendMessage(
+    //       { type: 'SUBMIT_REVIEW', data: reviewData },
+    //       resolve
+    //     );
+    //   });
+  
+    //   if (response?.success) {
+    //     console.log('Review submitted successfully!');
+    //     window.close();
+    //   } else {
+    //     console.error('Failed to submit review:', response?.error);
+    //     alert('Failed to submit review. Please try again.');
+    //   }
+    // } catch (error) {
+    //   console.error('Error submitting review:', error);
+    //   alert('An error occurred. Please try again.');
+    // }
+//   })
+// });
+  
