@@ -4,7 +4,7 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
-
+venv/
 # Crash log files
 crash.log
 crash.*.log
@@ -36,3 +36,7 @@ terraform.rc
 # Node.js dependencies
 node_modules/
 **/node_modules/
+
+
+
+babel.config.js
