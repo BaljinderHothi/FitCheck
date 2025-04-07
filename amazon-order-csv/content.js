@@ -1,4 +1,7 @@
-
+//things to be added
+// login for chrome extension
+// reminder to review recently bought items
+//POST reviews into 
 async function extractOrders() {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -104,6 +107,21 @@ function downloadCSV(data) {
   
 }
 
+function getOrderProducts() {
+  const products = new Set(); // Using Set to avoid duplicates
+  const orderContainers = document.querySelectorAll('.order-card__list');
+
+  orderContainers.forEach(container => {
+    const anchorElements = container.querySelectorAll('a.a-link-normal[href*="/dp/"]');
+    anchorElements.forEach(anchor => {
+      const itemName = anchor.innerText.trim();
+      if (itemName) products.add(itemName);
+    });
+  });
+
+  return Array.from(products);
+}
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'exportOrders') {
@@ -117,6 +135,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
 
     sendResponse({ success: true });
+  }
+
+  if (message.action === 'getProducts') {
+    const products = getOrderProducts();
+    sendResponse({ products });
+    return true;
   }
 });
 

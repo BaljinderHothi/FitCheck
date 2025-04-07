@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8"> 
   <title>Amazon Order History CSV</title>
   <style>
     body {
@@ -25,12 +26,98 @@
       color: #666;
       font-size: 14px;
     }
+    #recommended {
+      margin-top: 20px;
+      text-align: center;
+    }
+    #recommended img {
+      width: 80%;
+      border-radius: 5px;
+    }
+    #recommended p {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #333;
+    }
+    .rating {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    .star {
+      cursor: pointer;
+      font-size: 24px;
+      color: #ccc;
+    }
+    .star.selected {
+      color: gold;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 15px;
+    }
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
   <h2>Amazon Order History CSV</h2>
   <button id="exportBtn">Export Orders to CSV</button>
   <div id="status"></div>
+
+  <!-- Recommended Items Section -->
+  <div id="recommended">
+    <h3>Recommended Items</h3>
+    <img src="https://via.placeholder.com/150" alt="Recommended Item">
+    <p>Check out this amazing product that complements your recent orders!</p>
+  </div>
+
+   <div id="reviewSection">
+    <h2>Review Your Purchase</h2>
+    <!-- Review section content -->
+  
+    <div>
+      <select id="productSelector">
+        <option value="" disabled selected>Select a product...</option>
+        
+      </select>
+    </div>
+  
+  <div>
+    <label>How satisfied are you with this purchase?</label>
+    <div class="rating">
+      <span class="star" data-value="1">★</span>
+      <span class="star" data-value="2">★</span>
+      <span class="star" data-value="3">★</span>
+      <span class="star" data-value="4">★</span>
+      <span class="star" data-value="5">★</span>
+    </div>
+  </div>
+  
+  <div>
+    <label>Your review:</label>
+    <textarea id="reviewText" placeholder="Share your thoughts on this product..."></textarea>
+  </div>
+  
+  <div>
+    <label>Was this purchase worth it?</label>
+    <select id="worthIt">
+      <option value="yes">Yes, definitely</option>
+      <option value="maybe">Maybe, not sure yet</option>
+      <option value="no">No, I regret this purchase</option>
+    </select>
+  </div>
+  
+  <button id="submitReview">Submit Review</button>
+  </div>
+
   <script src="popup.js"></script>
+  <script src="review.js"></script>
+  
 </body>
-</html> 
+</html>

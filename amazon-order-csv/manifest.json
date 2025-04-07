@@ -23,6 +23,9 @@
     "https://www.amazon.com.mx/*",
     "https://www.amazon.com.au/*"
   ],
+  "background": {
+      "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": [

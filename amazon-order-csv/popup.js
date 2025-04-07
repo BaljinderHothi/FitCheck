@@ -37,4 +37,35 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Error:', error);
     }
   }, { once: true }); // Ensures event runs only once
+
+  chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+    if (!tabs[0].url.includes('amazon.com')) {
+      document.getElementById('productSelector').innerHTML = 
+        '<option value="" disabled>Please navigate to Amazon orders page</option>';
+      return;
+    }
+    
+    chrome.tabs.sendMessage(tabs[0].id, {action: 'getProducts'}, (response) => {
+      const selector = document.getElementById('productSelector');
+      
+      if (chrome.runtime.lastError) {
+        selector.innerHTML = '<option value="" disabled>Error loading products</option>';
+        return;
+      }
+      
+      if (response && response.products && response.products.length > 0) {
+        selector.innerHTML = '<option value="" disabled selected>Select a product...</option>';
+        
+        response.products.forEach((product, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.textContent = product;
+          selector.appendChild(option);
+        });
+      } else {
+        selector.innerHTML = '<option value="" disabled>No products found</option>';
+      }
+    });
+  });
+  
 });
