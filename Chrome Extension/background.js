@@ -1,4 +1,29 @@
 
+await chrome.scripting.executeScript({
+  target: { tabId: tab.id },
+  files: ['review.js']
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'SUBMIT_REVIEW') {
+    console.log('Received message:', message);
+    console.log('Sender:', sender);
+
+    const reviewDetails = message.data || {}; 
+    console.log('Review Details:', reviewDetails);
+
+
+    sendResponse({ success: true });
+  }
+  return true; 
+});
+
+
+
+
+
+
+
 chrome.runtime.onInstalled.addListener(() => {
     console.log('Extension installed');
 
@@ -201,3 +226,57 @@ chrome.runtime.onInstalled.addListener(() => {
     }
     
   });
+// background.js
+// background.js
+
+// Initialize storage if needed
+// chrome.runtime.onInstalled.addListener(() => {
+//   chrome.storage.local.set({ reviews: [] });
+// });
+
+// // Message handler with proper response
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//   console.log('Message received in background:', message);
+  
+//   if (message.action === 'SUBMIT_REVIEW') {
+//     handleReviewSubmission(message.data)
+//       .then(result => {
+//         sendResponse({ success: true, ...result });
+//       })
+//       .catch(error => {
+//         sendResponse({ 
+//           success: false, 
+//           error: error.message 
+//         });
+//       });
+    
+//     // Return true to indicate we'll send response asynchronously
+//     return true;
+//   }
+// });
+
+// async function handleReviewSubmission(reviewData) {
+//   // Validate the review data
+//   if (!reviewData?.product?.id || !reviewData.rating) {
+//     throw new Error('Invalid review data');
+//   }
+
+//   // Store the review
+//   return new Promise((resolve, reject) => {
+//     chrome.storage.local.get(['reviews'], (result) => {
+//       const reviews = result.reviews || [];
+//       reviews.push(reviewData);
+      
+//       chrome.storage.local.set({ reviews }, () => {
+//         if (chrome.runtime.lastError) {
+//           reject(new Error('Failed to store review'));
+//         } else {
+//           resolve({ 
+//             message: 'Review stored successfully',
+//             reviewId: Date.now() 
+//           });
+//         }
+//       });
+//     });
+//   });
+// }
