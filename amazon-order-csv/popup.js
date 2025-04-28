@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
+  //const submitReviewBtn = document.getElementById("submitReview");
+  const productSelector = document.getElementById('productSelector');
+  const reviewTextArea = document.getElementById('reviewText');
+  const worthItSelect = document.getElementById('worthIt');
+  //const stars = document.querySelectorAll('.star');
   const urlParams = new URLSearchParams(window.location.search);
   const purchaseId = urlParams.get('purchaseId');
   const productName = urlParams.get('product');
@@ -106,10 +111,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     if (selectedRating === 0) {
-      alert('Please select a rating');
+      alert('Please select a rating (popop.js)');
       return;
     }
     
+    // const reviewData = {
+    //     product: {
+    //       name: product,
+    //       id: productSelector.value
+    //     },
+    //     rating: selectedRating,
+    //     review: reviewText,
+    //     worthIt: worthIt,
+    //     meta: {
+    //       timestamp: new Date().toISOString(),
+    //       source: 'chrome_extension'
+    //     }
+    //   };
+    //console.log('Review data:', reviewData); // This will print to Chrome console
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -123,7 +142,19 @@ document.addEventListener('DOMContentLoaded', function () {
         files: ['review.js']
       });
 
-      chrome.tabs.sendMessage(tab.id, { action: 'SUBMIT_REVIEW' }, (response) => {
+      chrome.tabs.sendMessage(tab.id, { 
+        action: 'SUBMIT_REVIEW',
+        data: { 
+          name: productSelector.options[productSelector.selectedIndex].text,
+          worth_it: worthIt,
+          review: reviewText,
+          rating: selectedRating,
+          meta: {
+            timestamp: new Date().toISOString(),
+            source: 'chrome_extension'
+          }
+        } 
+      }, (response) => {
         if (chrome.runtime.lastError) {
           console.error('Chrome runtime error:', chrome.runtime.lastError);
           return;

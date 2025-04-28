@@ -1,12 +1,22 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'SUBMIT_REVIEW') {
-      console.log('Received review:', message.data);
-      // Add your API call here
-      sendResponse({ success: true });
-      alert('Review submitted successfully!');
-      return true;
-    }
-  });
+  if (message.type === 'SUBMIT_REVIEW') {
+    console.log('Received review in background:', message.payload);
+    // Here you could send to your backend API
+    sendResponse({ success: true });
+    return true; // Keep message channel open
+  }
+});
+
+
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//     if (message.type === 'SUBMIT_REVIEW') {
+//       console.log('Received review fdfdfd:', message.data);
+//       // Add your API call here
+//       sendResponse({ success: true });
+//       alert('Review submitted successfully!');
+//       return true;
+//     }
+//   });
 
 
 // chrome.runtime.onInstalled.addListener(() => {
