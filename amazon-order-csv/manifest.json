@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Fitcheck Amazon Order History CSV",
-  "version": "1.0",
+  "version": "3.0",
   "description": "Export your Amazon order history to CSV",
   "permissions": [
     "activeTab",
