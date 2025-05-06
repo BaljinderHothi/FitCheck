@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
   //const submitReviewBtn = document.getElementById("submitReview");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      chrome.storage.local.set({ loggedIn: false }, () => {
+        window.location.href = "login.html";
+      });
+    });
+  }
   const productSelector = document.getElementById('productSelector');
   const reviewTextArea = document.getElementById('reviewText');
   const worthItSelect = document.getElementById('worthIt');
