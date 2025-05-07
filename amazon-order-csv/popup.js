@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     if (selectedRating === 0) {
-      alert('Please select a rating (popop.js)');
+      alert('Please select a rating (popup.js)');
       return;
     }
     
