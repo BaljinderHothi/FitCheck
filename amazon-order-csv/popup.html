@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"> 
+  <title>Order History CSV</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      margin: 0;
+      padding: 20px;
+      width: 320px;
+      height: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    
+
+    h2, h3, label, p {
+      color: #fff;
+    }
+
+    button, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    select option {
+      background: #2c2c2c; /* dark background for dropdown */
+      color: #fff; /* white text inside dropdown */
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 100px;
+    }
+
+    .rating {
+      display: flex;
+      gap: 4px;
+      margin: 10px 0;
+    }
+
+    .star {
+      font-size: 24px;
+      color: #ccc;
+      cursor: pointer;
+    }
+
+    .star.selected {
+      color: gold;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #ddd;
+    }
+
+    #recommended {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #recommended img {
+      width: 80%;
+      border-radius: 8px;
+    }
+
+    #recommended p {
+      font-size: 14px;
+    }
+
+    #logoutContainer {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    #logoutBtn {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    #logoutIcon {
+      width: 22px;
+      height: 22px;
+      filter: brightness(0) invert(1); /* Make the icon white */
+    }
+
+    #logoutBtn:hover #logoutIcon {
+      opacity: 0.7;
+    }
+
+    #myTitle {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-container">
+    <div id="logoutContainer">
+      <button id="logoutBtn" title="Log Out">
+        <img src="logoutIMG.png" alt="Log Out" id="logoutIcon" />
+      </button>
+    </div>
+
+    <h2 id="myTitle">Fitcheck</h2>
+    <button id="exportBtn">Export Orders to CSV</button>
+    <div id="status"></div>
+
+    <div id="recommended">
+      <h3>Recommended Items</h3>
+      <img src="https://via.placeholder.com/150" alt="Recommended Item">
+      <p>Check out this amazing product that complements your recent orders!</p>
+    </div>
+
+    <div id="reviewSection">
+      <h2>Review Your Purchase</h2>
+
+      <select id="productSelector">
+        <option value="" disabled selected>Select a product...</option>
+      </select>
+
+      <label>How satisfied are you with this purchase?</label>
+      <div class="rating">
+        <span class="star" data-value="1">★</span>
+        <span class="star" data-value="2">★</span>
+        <span class="star" data-value="3">★</span>
+        <span class="star" data-value="4">★</span>
+        <span class="star" data-value="5">★</span>
+      </div>
+
+      <label>Your review:</label>
+      <textarea id="reviewText" placeholder="Share your thoughts on this product..."></textarea>
+
+      <label>Was this purchase worth it?</label>
+      <select id="worthIt">
+        <option value="yes">Yes, definitely</option>
+        <option value="maybe">Maybe, not sure yet</option>
+        <option value="no">No, I regret this purchase</option>
+      </select>
+
+      <button id="submitReview">Submit Review</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+  <script src="review.js"></script>
+</body>
+</html>
