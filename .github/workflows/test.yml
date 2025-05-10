@@ -3,12 +3,8 @@ name: Test Chrome Extension
 on:
   push:
     branches: [main]
-    paths:
-      - 'amazon-order-csv/**'
   pull_request:
     branches: [main]
-    paths:
-      - 'amazon-order-csv/**'
 
 jobs:
   test:
