@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - 'amazon-order-csv/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'amazon-order-csv/**'
 
 jobs:
   test:
@@ -15,7 +20,8 @@ jobs:
         working-directory: amazon-order-csv
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
