@@ -12,9 +12,20 @@ from typing import List
 from supabase import create_client, Client
 from datetime import datetime
 from dotenv import load_dotenv
+from fastapi import Header
+from fastapi.middleware.cors import CORSMiddleware
+
 load_dotenv()
+
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["chrome-extension://feimedmcocmeodonnecchkbdmpdbpebg"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
@@ -64,48 +75,87 @@ class ReviewRequest(BaseModel):
 
 
 def store_review(data):
-   try:
-       response = supabase.table("sentiment").insert(data).execute()
-       if response.status_code == 201:
-           print("Review stored successfully in Supabase!")
-       else:
-           print(f"Failed to store review in Supabase:{response.status_code}")
-   except Exception as e:
-       print(f"Error while storing review in Supabase:{str(e)}")
+    try:
+        response = supabase.table("sentiment").insert(data).execute()
+        if response.data:
+            print("Review stored successfully in Supabase!")
+        else:
+            print(f"Failed to store review. Error: {response.error}")
+    except Exception as e:
+        print(f"Exception while storing review: {str(e)}")
+
+
 
 
 @app.post("/analyze-product-review")
-def analyze_product_review(review_request: ReviewRequest):
-   print("Api called")
-   if not (1 <= review_request.rating <= 5):
-       raise HTTPException(status_code=400, detail="Star ratings must be from 1 to 5.")
-   raw_sentiments = sentiment_pipeline(review_request.review)
-   sentiments = raw_sentiments[0]
-   sentiment = {
-       "label": label_mapping.get(sentiments["label"], sentiments["label"]),
-       "score": round(sentiments["score"], 4)
-   }
-   created_at = datetime.now().isoformat()
-   data = {
-       "name": review_request.name,
-       "worth_it": review_request.worth_it,
-       "review": review_request.review,
-       "rating": review_request.rating,
-       "meta": review_request.meta,
-       "sentiment_label": sentiment["label"],
-       "sentiment_score": sentiment["score"],
-       "created_at": created_at
-   }
+def analyze_product_review(
+    review_request: ReviewRequest,
+    authorization: str = Header(None)
+):
+    print("API called")
+
+    if not (1 <= review_request.rating <= 5):
+        raise HTTPException(status_code=400, detail="Star ratings must be from 1 to 5.")
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+
+    token = authorization.split("Bearer ")[1]
+    try:
+        user_response = supabase.auth.get_user(token)
+        print("User response:", user_response)
+        user = user_response.user
+        print("User:", user)
+    except Exception as e:
+        print("Auth error:", str(e))
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+
+    user_email = user.email
+    print("User email:", user_email)
+    user_lookup = supabase.table("users").select("*").eq("email", user_email).execute()
 
 
-   store_review(data)
+    if not user_lookup.data or len(user_lookup.data) == 0:
+        raise HTTPException(status_code=404, detail="User record not found in user table")
+
+    print("User lookup:", user_lookup.data)
+
+    table_user_id = user_lookup.data[0]["userid"]
+
+    
+    print("Table user ID:", table_user_id)
+
+    raw_sentiments = sentiment_pipeline(review_request.review)
+    sentiments = raw_sentiments[0]
+    sentiment = {
+        "label": label_mapping.get(sentiments["label"], sentiments["label"]),
+        "score": round(sentiments["score"], 4)
+    }
+
+    created_at = datetime.now().isoformat()
+    data = {
+        "userid": table_user_id,
+        "product_name": review_request.name,
+        "worth_it": review_request.worth_it,
+        "review_text": review_request.review, 
+        "star_rating": review_request.rating, 
+        "meta": review_request.meta,
+        "sentiment_label": sentiment["label"],
+        "sentiment_score": sentiment["score"],
+        "created_at": created_at
+    }
 
 
-   return {
-       "message": "Review analyzed and stored",
-       "sentiment": sentiment,
-       "data": data
-   }
+    store_review(data)
+
+    return {
+        "message": "Review analyzed and stored",
+        "sentiment": sentiment,
+        "data": data
+    }
+
 
 
 if __name__ == "__main__":
