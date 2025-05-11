@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "Fitcheck Amazon Order History CSV",
+  "version": "3.0",
+  "description": "Export your Amazon order history to CSV",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.amazon.com/*",
+    "https://www.amazon.co.uk/*",
+    "https://www.amazon.de/*",
+    "https://www.amazon.fr/*",
+    "https://www.amazon.it/*",
+    "https://www.amazon.es/*",
+    "https://www.amazon.ca/*",
+    "https://www.amazon.co.jp/*",
+    "https://www.amazon.in/*",
+    "https://www.amazon.com.br/*",
+    "https://www.amazon.com.mx/*",
+    "https://www.amazon.com.au/*"
+  ],
+  "background": {
+      "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.amazon.com/*",
+        "https://www.amazon.co.uk/*",
+        "https://www.amazon.de/*",
+        "https://www.amazon.fr/*",
+        "https://www.amazon.it/*",
+        "https://www.amazon.es/*",
+        "https://www.amazon.ca/*",
+        "https://www.amazon.co.jp/*",
+        "https://www.amazon.in/*",
+        "https://www.amazon.com.br/*",
+        "https://www.amazon.com.mx/*",
+        "https://www.amazon.com.au/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "check.html",
+    "default_icon": {
+      "16": "icons/m16x16.png",
+      "48": "icons/m48x48.png",
+      "128": "icons/m128x128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/m16x16.png",
+    "48": "icons/m48x48.png",
+    "128": "icons/m128x128.png"
+  }
+} 

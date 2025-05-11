@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import MainLayout from "../components/layout.jsx";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -39,56 +41,59 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-      <div className="bg-black dark:bg-gray-800 p-8 rounded-xl shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
-          Login to Fit Check
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300 mb-1" htmlFor="email">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300 mb-1" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-          {error && <p className="text-red-500 text-center">{error}</p>}
-          {message && <p className="text-green-500 text-center">{message}</p>}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200 dark:bg-blue-700 dark:hover:bg-blue-800"
-          >
-            Login
-          </button>
-        </form>
-        <p className="text-center text-gray-600 dark:text-gray-400 mt-4">
-          Don’t have an account?{' '}
-          <a href="/register" className="text-blue-600 hover:underline dark:text-blue-500">
-            Register
-          </a>
-        </p>
+    <MainLayout>
+
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="fixed top-0 left-0 w-full h-full object-cover z-0"
+      >
+        <source src= "/pinkvid.mp4" type="video/mp4" />
+      </video>
+
+      <div className="flex items-center justify-center h-screen px-10 relative z-10">
+        <div className="bg-zinc-800 p-10 rounded-xl shadow-xl max-w-md w-full space-y-6">
+          <h1 className="text-4xl font-bold text-center">Login</h1>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="email" className="block text-sm mb-1">Email</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm mb-1">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-zinc-700 text-white border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-zinc-600 hover:bg-zinc-500 transition px-4 py-2 rounded-lg text-white font-semibold"
+            >
+              Sign In
+            </button>
+          </form>
+          <p className="text-sm text-center text-zinc-400">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-zinc-200 hover:underline">
+              Register
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }

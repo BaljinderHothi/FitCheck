@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+transformers>=4.51.0
+torch
+supabase
+python-dotenv
