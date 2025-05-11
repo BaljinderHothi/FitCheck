@@ -1,14 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
   //const submitReviewBtn = document.getElementById("submitReview");
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      chrome.storage.local.set({ loggedIn: false }, () => {
-        window.location.href = "login.html";
-      });
-    });
-  }
   const productSelector = document.getElementById('productSelector');
   const reviewTextArea = document.getElementById('reviewText');
   const worthItSelect = document.getElementById('worthIt');
@@ -16,14 +7,15 @@ document.addEventListener('DOMContentLoaded', function () {
   const urlParams = new URLSearchParams(window.location.search);
   const purchaseId = urlParams.get('purchaseId');
   const productName = urlParams.get('product');
-
+ 
+ 
   let selectedRating = 0;
   const stars = document.querySelectorAll('.star');
   stars.forEach(star => {
     star.addEventListener('click', () => {
       const value = parseInt(star.getAttribute('data-value'));
       selectedRating = value;
-      
+     
       stars.forEach(s => {
         const starValue = parseInt(s.getAttribute('data-value'));
         if (starValue <= selectedRating) {
@@ -34,65 +26,74 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   });
-
+ 
+ 
   const exportBtn = document.getElementById('exportBtn');
   const submitReviewBtn = document.getElementById("submitReview");
-
+ 
+ 
   exportBtn.addEventListener('click', async () => {
     if (exportBtn.dataset.clicked) return;
     exportBtn.dataset.clicked = true;
-
+ 
+ 
     console.log("Exporting orders...");
-
+ 
+ 
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
+ 
+ 
       if (!tab.url.includes('amazon.com')) {
         console.error('Please navigate to Amazon orders page');
         return;
       }
-
+ 
+ 
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ['content.js']
       });
-
+ 
+ 
       chrome.tabs.sendMessage(tab.id, { action: 'exportOrders' }, (response) => {
         if (chrome.runtime.lastError) {
           console.error('Chrome runtime error:', chrome.runtime.lastError);
           return;
         }
-        
+       
         if (response && response.success) {
           console.log('Orders exported successfully!');
         } else {
           console.error(response?.error || 'Failed to export orders.');
         }
       });
-
+ 
+ 
     } catch (error) {
       console.error('Error:', error);
     }
   }, { once: true });
-
+ 
+ 
   chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     if (!tabs[0].url.includes('amazon.com')) {
-      document.getElementById('productSelector').innerHTML = 
+      document.getElementById('productSelector').innerHTML =
         '<option value="" disabled>Please navigate to Amazon orders page</option>';
       return;
     }
-    
+   
     chrome.tabs.sendMessage(tabs[0].id, {action: 'getProducts'}, (response) => {
       const selector = document.getElementById('productSelector');
-      
+     
       if (chrome.runtime.lastError) {
         selector.innerHTML = '<option value="" disabled>Error loading products</option>';
         return;
       }
-      
+     
       if (response && response.products && response.products.length > 0) {
         selector.innerHTML = '<option value="" disabled selected>Select a product...</option>';
-        
+       
         response.products.forEach((product, index) => {
           const option = document.createElement('option');
           option.value = index;
@@ -104,26 +105,27 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
-
+ 
+ 
   // Only ONE event listener for the submit button
   submitReviewBtn.addEventListener("click", async () => {
     console.log("Submit button clicked"); // This will print to Chrome console
-    
+   
     const productSelector = document.getElementById('productSelector');
     const reviewText = document.getElementById('reviewText').value;
     const worthIt = document.getElementById('worthIt').value;
-    
+   
     // Rest of your existing code...
     if (!productSelector.value || productSelector.selectedIndex <= 0) {
       alert('Please select a product to review');
       return;
     }
-    
+   
     if (selectedRating === 0) {
-      alert('Please select a rating (popup.js)');
+      alert('Please select a rating (popop.js)');
       return;
     }
-    
+   
     // const reviewData = {
     //     product: {
     //       name: product,
@@ -140,20 +142,23 @@ document.addEventListener('DOMContentLoaded', function () {
     //console.log('Review data:', reviewData); // This will print to Chrome console
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
+ 
+ 
       if (!tab.url.includes('amazon.com')) {
         console.error('Please navigate to Amazon orders page');
         return;
       }
-
+ 
+ 
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ['review.js']
       });
-
-      chrome.tabs.sendMessage(tab.id, { 
+ 
+ 
+      chrome.tabs.sendMessage(tab.id, {
         action: 'SUBMIT_REVIEW',
-        data: { 
+        data: {
           name: productSelector.options[productSelector.selectedIndex].text,
           worth_it: worthIt,
           review: reviewText,
@@ -162,27 +167,52 @@ document.addEventListener('DOMContentLoaded', function () {
             timestamp: new Date().toISOString(),
             source: 'chrome_extension'
           }
-        } 
+        }
       }, (response) => {
         if (chrome.runtime.lastError) {
           console.error('Chrome runtime error:', chrome.runtime.lastError);
           return;
         }
-        
+       
         if (response && response.success) {
           console.log('Submit (line 133) successfully!');
         } else {
           console.error(response?.error || 'Failed to export orders.');
         }
       });
-
+ 
+ 
     } catch (error) {
       console.error('Error:', error);
     }
-
+ 
+ 
   })
-});
-    
+  fetch("http://localhost:8000/analyze-product-review", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: productSelector.options[productSelector.selectedIndex].text,
+      worth_it:worthIt,
+      review:reviewText,
+      rating:selectedRating,
+      meta: {
+        timestamp: new Date().toISOString(),
+        source: "chrome_extension"
+      }
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("Sentiment analysis result:", data);
+  })
+  .catch(error => {
+    console.error("Error sending to sentiment analysis API:", error);
+  });
+ });
+   
     // const reviewData = {
     //   product: productSelector.options[productSelector.selectedIndex].text,
     //   rating: selectedRating,
@@ -190,8 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //   worthIt,
     //   timestamp: new Date().toISOString()
     // };
-  
-    //console.log('Submitting review:', reviewData);
+     //console.log('Submitting review:', reviewData);
     //alert('Submitting review...');
     // try {
     //   const response = await new Promise((resolve) => {
@@ -200,8 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //       resolve
     //     );
     //   });
-  
-    //   if (response?.success) {
+     //   if (response?.success) {
     //     console.log('Review submitted successfully!');
     //     window.close();
     //   } else {
@@ -212,6 +240,6 @@ document.addEventListener('DOMContentLoaded', function () {
     //   console.error('Error submitting review:', error);
     //   alert('An error occurred. Please try again.');
     // }
-//   })
-// });
-  
+ //   })
+ // });
+ 
