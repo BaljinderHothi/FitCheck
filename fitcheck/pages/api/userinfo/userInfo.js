@@ -12,7 +12,8 @@ export default async function handler(req, res) {
   const token = authHeader.split('Bearer ')[1];
   const { data: userData, error: userError } = await supabase.auth.getUser(token);
 
-  if (userError||!userData?.user?.email) {
+  if (userError || !userData?.user?.email) {
+    console.error('Error fetching user data:', userError);
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
   const email = userData.user.email;
