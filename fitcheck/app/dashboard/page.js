@@ -1,6 +1,6 @@
 "use client";
 
-import { Main } from "next/document";
+// import { Main } from "next/document";
 import Image from "next/image";
 import { useState } from "react";
 import MainLayout from "../components/layout.jsx";
