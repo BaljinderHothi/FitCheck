@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "Fit Check Purchase Tracker",
+    "version": "1.0",
+    "description": "Scrapes purchase items and prices from pages to help track spending.",
+    "permissions": [
+      "storage",
+      "scripting",
+      "activeTab",
+      "notifications",
+      "alarms"
+    ],
+    "host_permissions": [
+      "<all_urls>"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["contentScript.js"],
+        "run_at": "document_end"
+      }
+    ]
+  }
+  

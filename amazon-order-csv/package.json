@@ -1,0 +1,23 @@
+{
+  "name": "amazon-order-csv",
+  "version": "1.0.0",
+  "description": "Chrome extension to export Amazon order history to CSV",
+  "main": "content.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFiles": [
+      "./tests/setup.js"
+    ]
+  }
+}
