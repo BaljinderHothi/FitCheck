@@ -38,7 +38,7 @@ const handleSubmit = async (e) => {
         setTimeout(() => {
           window.location.href = '/dashboard';
         }
-        , 2000); // Redirect after 2 seconds
+        , 2000); 
 
       }
     } catch (err) {
