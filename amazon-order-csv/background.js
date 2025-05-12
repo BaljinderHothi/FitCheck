@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.tabs.create({ url: "https://www.google.com/" });
+  chrome.tabs.create({ url: "https://fitcheck-nirathh-nirathhs-projects.vercel.app/" });
 });
 
 
