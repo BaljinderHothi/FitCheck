@@ -40,3 +40,4 @@ node_modules/
 .env
 
 babel.config.js
+.env.local
