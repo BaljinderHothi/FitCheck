@@ -3,6 +3,16 @@ import supabase from '../../../utils/supabase/config';
 export default async function handler(req, res) {
   console.log('Request method:', req.method);
   console.log('Request body:', req.body);
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*'); // or specific origin
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Required for CORS
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
@@ -25,12 +35,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid login credentials' });
     }
 
-    if (!data.user) {
-      console.log('User not found or incorrect credentials');
-      return res.status(400).json({ error: 'User not found or incorrect credentials' });
+    if (!data.user || !data.session) {
+      console.log('User not found or session missing');
+      return res.status(400).json({ error: 'User not found or session missing' });
     }
 
-    if (data.user && !data.user.user_metadata.email_verified) {
+    if (!data.user.user_metadata.email_verified) {
       return res.status(200).json({
         message: 'Please Verify Your Email',
         user: data.user,
@@ -40,6 +50,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       message: 'Login Successful',
       user: data.user,
+      token: data.session.access_token,
     });
   } catch (err) {
     console.error('Internal Server Error:', err);

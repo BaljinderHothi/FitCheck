@@ -37,6 +37,6 @@ terraform.rc
 node_modules/
 **/node_modules/
 
-
+.env
 
 babel.config.js

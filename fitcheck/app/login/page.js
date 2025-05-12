@@ -32,7 +32,10 @@ export default function LoginPage() {
         setError(data.error || 'An error occurred');
       } else {
         setMessage(data.message);
-        // Handle successful login (e.g., redirect to dashboard)
+        localStorage.setItem('access_token', data.token);
+        localStorage.setItem('user_id', data.user.id);
+        console.log('Access token saved:', data.token);
+        console.log('User ID saved:', data.user.id);
       }
     } catch (err) {
       console.error('Error during fetch:', err);
