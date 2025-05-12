@@ -51,7 +51,10 @@ export default async function handler(req, res) {
       message: 'Login Successful',
       user: data.user,
       token: data.session.access_token,
+      refreshToken: data.session.refresh_token,
+      expiresIn: data.session.expires_in 
     });
+    
   } catch (err) {
     console.error('Internal Server Error:', err);
     return res.status(500).json({ error: 'Internal Server Error' });
