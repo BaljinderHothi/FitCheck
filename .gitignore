@@ -32,6 +32,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+<<<<<<< Updated upstream
 
 # Node.js dependencies
 node_modules/
@@ -41,3 +42,4 @@ node_modules/
 
 babel.config.js
 .env.local
+
