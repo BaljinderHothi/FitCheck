@@ -4,4 +4,4 @@ pytest
 pytest-cov
 playwright
 python-dotenv
-supabase-py
+git+https://github.com/supabase-community/supabase-py.git
