@@ -1,9 +1,6 @@
 import supabase from '../../../utils/supabase/config';
 
 export default async function handler(req, res) {
-  console.log('🔄 Request method:', req.method);
-  console.log('📩 Request body:', req.body);
-
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -12,35 +9,32 @@ export default async function handler(req, res) {
   }
 
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      console.log('⚠️ Missing email or password');
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    console.log('🔐 Signing in with:', email);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      console.error('❌ Supabase Error:', error.message);
+      console.error('Login error:', error.message);
       return res.status(400).json({ error: error.message || 'Invalid login credentials' });
     }
 
     if (!data.user || !data.session) {
-      console.warn('⚠️ Missing user or session');
       return res.status(400).json({ error: 'User not found or session missing' });
     }
 
-    const emailVerified = data.user?.user_metadata?.email_verified ?? false;
+    const emailVerified = data.user.user_metadata?.email_verified;
     if (!emailVerified) {
       return res.status(200).json({
         message: 'Please Verify Your Email',
@@ -57,7 +51,7 @@ export default async function handler(req, res) {
     });
 
   } catch (err) {
-    console.error('🔥 Internal Server Error:', err);
+    console.error('Server error:', err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
