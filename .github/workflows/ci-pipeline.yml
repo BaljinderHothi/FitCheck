@@ -41,11 +41,14 @@ jobs:
         run: npm run build
 
       - name: Start Next.js server in background
-        run: |
-          cd fitcheck
-          NEXT_PUBLIC_MOCK_GEMINI=true nohup npm run start &
+        working-directory: ./fitcheck
+        env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          NEXT_PUBLIC_MOCK_GEMINI: true
+        run: |
+          nohup npm run start &
+
 
       - name: Wait for server to be ready
         run: |
