@@ -8,11 +8,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      NEXT_PUBLIC_MOCK_GEMINI: true
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,22 +33,21 @@ jobs:
         working-directory: ./fitcheck
         run: npm install
 
+      - name: Create .env.local for Next.js
+        working-directory: ./fitcheck
+        run: |
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env.local
+          echo "NEXT_PUBLIC_SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_MOCK_GEMINI=true" >> .env.local
+
       - name: Build Next.js app
         working-directory: ./fitcheck
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          NEXT_PUBLIC_MOCK_GEMINI: true
         run: npm run build
 
       - name: Start Next.js server in background
         working-directory: ./fitcheck
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          NEXT_PUBLIC_MOCK_GEMINI: true
         run: |
-          nohup npm start > ../nextjs.log 2>&1 &
+          nohup npm run start > ../nextjs.log 2>&1 &
 
       - name: Wait for server to be ready
         run: |
@@ -74,3 +68,4 @@ jobs:
         with:
           name: coverage-report
           path: htmlcov
+
