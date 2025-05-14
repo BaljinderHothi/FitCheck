@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NEXT_PUBLIC_MOCK_GEMINI: true  
+      NEXT_PUBLIC_MOCK_GEMINI: true
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -40,9 +41,9 @@ jobs:
         run: npm run build
 
       - name: Start Next.js server in background
-        working-directory: ./fitcheck
         run: |
-          nohup NEXT_PUBLIC_MOCK_GEMINI=true npm run start &
+          cd fitcheck
+          NEXT_PUBLIC_MOCK_GEMINI=true nohup npm run start &
 
       - name: Wait for server to be ready
         run: |
