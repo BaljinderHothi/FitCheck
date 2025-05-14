@@ -10,6 +10,8 @@ jobs:
 
     env:
       NEXT_PUBLIC_MOCK_GEMINI: true
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
     steps:
       - name: Checkout code
@@ -38,17 +40,12 @@ jobs:
 
       - name: Build Next.js app
         working-directory: ./fitcheck
-        run: npm run build
+        run: npm run build -- --ci
 
       - name: Start Next.js server in background
         working-directory: ./fitcheck
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          NEXT_PUBLIC_MOCK_GEMINI: true
         run: |
-          nohup npm run start &
-
+          nohup npm run start > ../nextjs.log 2>&1 &
 
       - name: Wait for server to be ready
         run: |
@@ -58,8 +55,11 @@ jobs:
       - name: Run Python tests with coverage
         run: pytest --cov=./ --cov-report=html
 
-      - name: Run Playwright E2E test
+      - name: Run Playwright E2E test (Login + Dashboard)
         run: python tests/test_login_e2e.py
+
+      - name: Run Playwright E2E test (Extension UI)
+        run: xvfb-run -a python tests/test_popup_ui.py
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
