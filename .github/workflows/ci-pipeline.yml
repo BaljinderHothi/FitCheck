@@ -9,9 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-
+      NEXT_PUBLIC_MOCK_GEMINI: true  
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -43,7 +41,8 @@ jobs:
 
       - name: Start Next.js server in background
         working-directory: ./fitcheck
-        run: nohup npm run start &
+        run: |
+          nohup NEXT_PUBLIC_MOCK_GEMINI=true npm run start &
 
       - name: Wait for server to be ready
         run: |
@@ -61,4 +60,3 @@ jobs:
         with:
           name: coverage-report
           path: htmlcov
-
