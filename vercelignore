@@ -1,0 +1,4 @@
+fitcheck/api/app.py
+*.py
+requirements.txt
+.env
