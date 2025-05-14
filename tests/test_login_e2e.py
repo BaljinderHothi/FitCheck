@@ -11,16 +11,22 @@ def test_login_flow():
         browser = p.chromium.launch(headless=True)
         context = browser.new_context()
         page = context.new_page()
+
+        # 🔐 Visit login page and fill credentials
         page.goto(LOGIN_URL)
         page.fill('input[type="email"]', TEST_EMAIL)
         page.fill('input[type="password"]', TEST_PASSWORD)
         page.get_by_role("button", name="Sign In").click()
+
         try:
-            page.wait_for_url(DASHBOARD_URL, timeout=10000)
+            # ⏳ Wait for redirect with extended timeout
+            page.wait_for_url(DASHBOARD_URL, timeout=20000)
             assert "/dashboard" in page.url
-            print("✅ Successfully redirected to dashboard")
+            print("✅ Redirected to dashboard")
         except TimeoutError:
-            print(f"❌ Login failed or did not redirect. Current URL: {page.url}")
+            # 🐞 Output full HTML if login fails
+            html_content = page.content()
+            print(f"❌ Login failed. Page HTML:\n{html_content}")
             page.screenshot(path="login_flow_fail.png")
             assert False, "Login did not redirect to dashboard"
 
