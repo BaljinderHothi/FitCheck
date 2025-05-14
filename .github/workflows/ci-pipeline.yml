@@ -5,22 +5,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:14
-        ports: [5432:5432]
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: testdb
-        options: |
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
 
     steps:
       - name: Checkout code
@@ -53,18 +39,17 @@ jobs:
 
       - name: Start Next.js server in background
         working-directory: ./fitcheck
-        run: |
-          nohup npm run start &
+        run: nohup npm run start &
 
       - name: Wait for server to be ready
         run: |
           sleep 10
           curl --retry 5 --retry-delay 5 --fail http://localhost:3000 || exit 1
 
-      - name: Run integration and unit tests with coverage
+      - name: Run Python tests with coverage
         run: pytest --cov=./ --cov-report=html
 
-      - name: Run Playwright end-to-end test
+      - name: Run Playwright E2E test
         run: python tests/test_login_e2e.py
 
       - name: Upload coverage report
