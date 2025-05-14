@@ -40,7 +40,8 @@ jobs:
 
       - name: Build Next.js app
         working-directory: ./fitcheck
-        run: npm run build -- --ci
+        run: npm run build
+
 
       - name: Start Next.js server in background
         working-directory: ./fitcheck
