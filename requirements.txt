@@ -4,4 +4,8 @@ pytest
 pytest-cov
 playwright
 python-dotenv
+pytest-asyncio
+pytest-tornasync
+pytest-trio
+pytest-twisted
 git+https://github.com/supabase-community/supabase-py.git
