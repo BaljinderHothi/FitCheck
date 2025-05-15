@@ -1,0 +1,93 @@
+name: CI Test Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    continue-on-error: false
+
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      NEXT_PUBLIC_MOCK_GEMINI: true
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+    steps:
+      - name: 🧾 Checkout code
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: ⚙️ Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: ♻️ Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: ♻️ Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ./fitcheck/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('fitcheck/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov playwright
+          playwright install
+
+      - name: Install frontend dependencies
+        working-directory: ./fitcheck
+        run: npm install
+
+      - name: Build Next.js app
+        working-directory: ./fitcheck
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          NEXT_PUBLIC_MOCK_GEMINI: true
+        run: npm run build
+
+      - name: Start Next.js server in background
+        working-directory: ./fitcheck
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          NEXT_PUBLIC_MOCK_GEMINI: true
+        run: |
+          nohup npm start > ../nextjs.log 2>&1 &
+
+      - name: Wait for server to be ready
+        run: |
+          for i in {1..10}; do
+            curl --fail http://localhost:3000/login && break || sleep 3
+          done || (echo "Server failed to start or /login not reachable" && cat fitcheck/../nextjs.log && exit 1)
+
+      - name: Run Python tests with coverage
+        run: pytest --cov=./ --cov-report=html
+
+      - name: Run Playwright E2E test (Login + Dashboard)
+        run: python tests/test_login_e2e.py
+
+      - name: Run Playwright E2E test (Extension UI)
+        run: xvfb-run -a python tests/test_popup_ui.py
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov

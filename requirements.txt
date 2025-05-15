@@ -1,0 +1,12 @@
+fastapi
+requests
+pytest
+pytest-cov
+pytest-asyncio
+pytest-tornasync
+pytest-trio
+pytest-twisted
+playwright
+python-dotenv
+twisted
+git+https://github.com/supabase-community/supabase-py.git

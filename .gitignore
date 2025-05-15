@@ -43,3 +43,5 @@ node_modules/
 babel.config.js
 .env.local
 
+__pycache__/
+*.py[cod]
