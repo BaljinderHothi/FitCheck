@@ -10,6 +10,7 @@ jobs:
     continue-on-error: false
 
     env:
+      PYTHONPATH: ${{ github.workspace }}/fitcheck
       NEXT_PUBLIC_MOCK_GEMINI: true
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
