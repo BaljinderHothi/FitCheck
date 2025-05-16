@@ -56,7 +56,7 @@ const handleSubmit = async (e) => {
         playsInline
         className="fixed top-0 left-0 w-full h-full object-cover z-0"
       >
-        <source src= "/pinkoutfit.mp4" type="video/mp4" />
+        <source src= "/purpleloop.mp4" type="video/mp4" />
       </video>
 
       <div className="flex items-center justify-center h-screen px-10 relative z-10">

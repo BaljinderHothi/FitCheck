@@ -80,7 +80,7 @@ export default function Dashboard() {
         playsInline
         className="fixed top-0 left-0 w-full h-full object-cover z-0"
       >
-        <source src="/pinkvid.mp4" type="video/mp4" />
+        <source src="/purpleloop.mp4" type="video/mp4" />
       </video>
 
       <div className="relative z-10 min-h-screen bg-black/70 text-white px-8 py-12 backdrop-blur-sm">
