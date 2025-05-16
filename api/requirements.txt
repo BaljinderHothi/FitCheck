@@ -5,3 +5,4 @@ torch
 supabase
 python-dotenv
 gunicorn
+uvicorn
