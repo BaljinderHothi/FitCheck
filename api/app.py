@@ -32,16 +32,16 @@ key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 
-tokenizer = AutoTokenizer.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment")
-model = AutoModelForSequenceClassification.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment")
+tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
+model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
+#changed these for render storage situations
 sentiment_pipeline = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
 
 #LABEL_0 -> negative, LABEL_1 -> neutral, LABEL_2 -> positive
 label_mapping = {
-   "LABEL_0": "negative",
-   "LABEL_1": "neutral",
-   "LABEL_2": "positive"
+    "LABEL_0": "negative",
+    "LABEL_1": "positive"
 }
 
 
@@ -159,5 +159,6 @@ def analyze_product_review(
 
 
 if __name__ == "__main__":
-   import uvicorn
-   uvicorn.run(app, host="0.0.0.0", port=8000)
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))  # fallback for local testing
+    uvicorn.run(app, host="0.0.0.0", port=port)
